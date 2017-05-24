@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
-# kbdancer@92ez.com
+# code by kbdancer@92ez.com
 
 import MySQLdb
 import sys

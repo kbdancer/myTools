@@ -1,6 +1,6 @@
-#! /usr/bin/env python
-# ! coding=utf-8
-# ! author kbdancer @92ez.com
+#!/usr/bin/env python
+# coding=utf-8
+# code by kbdancer@92ez.com
 
 import threading
 import requests
