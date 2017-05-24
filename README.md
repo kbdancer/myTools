@@ -1,5 +1,6 @@
 # 我的工具集
 这个仓库存放了我平时开发、测试时候编写的一些小工具脚本，目的是提高编程的效率
+
 ### 0x00: czip2mysql
 这个工具是用来将纯真ip数据库转存到mysql数据库的脚本
 
@@ -39,3 +40,8 @@ http://www.92ez.com/?action=show&id=23405
 因为我在网上随便找一个磁力链搜索站点，都TM是一大堆弹窗广告，我很不爽！
 
 相关文档 http://www.92ez.com/?action=show&id=23377
+
+### 0x06: getIPRange
+自己用的一个获取IP段的脚本（抓取http://ips.chacuo.net）
+
+文档待补充
