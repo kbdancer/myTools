@@ -32,3 +32,10 @@
 http://www.92ez.com/?action=show&id=23373
 
 http://www.92ez.com/?action=show&id=23405
+
+### 0x05: BTsearch
+这是一个小爬虫~
+
+因为我在网上随便找一个磁力链搜索站点，都TM是一大堆弹窗广告，我很不爽！
+
+相关文档 http://www.92ez.com/?action=show&id=23377
