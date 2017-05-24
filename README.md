@@ -27,6 +27,8 @@
 
 一键登录、断开重新拨号（用于更换IP）、重启路由器
 
-登录部分文档 http://www.92ez.com/index.php?action=show&id=23373
+原理以及实现 
 
-功能部分文档 http://www.92ez.com/?action=show&id=23405
+http://www.92ez.com/?action=show&id=23373
+
+http://www.92ez.com/?action=show&id=23405
