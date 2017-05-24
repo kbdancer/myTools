@@ -19,10 +19,10 @@ R = '\033[31m'  # red
 G = '\033[32m'  # green
 
 
-def bThread(urllist):
+def bThread(url_list):
     threadl = []
     queue = Queue.Queue()
-    for url in urllist:
+    for url in url_list:
         queue.put(url)
 
     for x in xrange(0, 20):
@@ -44,79 +44,77 @@ class tThread(threading.Thread):
         while not self.queue.empty():
             url = self.queue.get()
             try:
-                decodeBTmayi(url)
+                decode_btant(url)
             except:
                 continue
 
 
-def getUrlByBTmayi():
+def get_url_by_btant():
     keyword = sys.argv[1]
     url = "http://www.btany.com/search/" + keyword + "-first-asc-1"
     print '[*] 获取 www.btany.com 基本信息...'
     try:
-        req = requests.get(url=url, verify=False, headers=headers, timeout=20)
-        responseStr = req.content
-
+        response_string = requests.get(url=url, verify=False, HEADERS=HEADERS, timeout=20).content
         # no result
-        if len(responseStr.split('<span>无<b>')) > 1:
+        if len(response_string.split('<span>无<b>')) > 1:
             return json.dumps({"code": -1, "msg": "can not find any page!"})
             sys.exit()
 
-        temppage = re.findall(r'<div class="bottom-pager">(.+?)</div>', responseStr, re.S)[0].replace('\n', '')
-        pagestr = re.findall(r'<a href="(.+?)">', temppage)
+        temp_page = re.findall(r'<div class="bottom-pager">(.+?)</div>', response_string, re.S)[0].replace('\n', '')
+        page_string = re.findall(r'<a href="(.+?)">', temp_page)
 
-        if len(pagestr) < 1:
+        if len(page_string) < 1:
             # only one page
-            maxpage = 1
+            max_page_number = 1
         else:
-            maxpage = int(re.findall(r'<a href="(.+?)">', temppage)[-1].split('asc-')[1])
+            max_page_number = int(re.findall(r'<a href="(.+?)">', temp_page)[-1].split('asc-')[1])
 
-        urllist = []
+        url_list = []
 
-        for pl in range(1, maxpage + 1):
-            urllist.append("http://www.btany.com/search/" + keyword + "-first-asc-" + str(pl))
+        for pl in range(1, max_page_number + 1):
+            url_list.append("http://www.btany.com/search/" + keyword + "-first-asc-" + str(pl))
 
-        bThread(urllist)
+        bThread(url_list)
 
     except Exception, e:
         print e
 
 
-def decodeBTmayi(url):
+def decode_btant(url):
     print '[*] 正在解析 '+ url + ' 的数据...'
     try:
-        tmpreq = requests.get(url=url, headers=headers, verify=False, timeout=20)
-        htmlstr = tmpreq.content
+        decode_html = requests.get(url=url, HEADERS=HEADERS, verify=False, timeout=20).content
 
-        magnet = re.findall(r'href="magnet(.+?)"', htmlstr)
-        thunder = re.findall(r'href="thunder(.+?)"', htmlstr)
-        title = re.findall(r'<div class="item-list">(.+?)</div>', htmlstr, re.S)
+        magnet = re.findall(r'href="magnet(.+?)"', decode_html)
+        thunder = re.findall(r'href="thunder(.+?)"', decode_html)
+        title = re.findall(r'<div class="item-list">(.+?)</div>', decode_html, re.S)
 
         for x in range(0, len(magnet)):
-            tempTtitle = title[x].replace('<span class="highlight">', '').replace('</span>', '').replace('\n', ' ')
-            size = re.findall(r'<span>(.+?)</p>', tempTtitle)
-            titleText = re.findall(r'<p>(.+?)<span>', tempTtitle)
+            temp_title = title[x].replace('<span class="highlight">', '').replace('</span>', '').replace('\n', ' ')
+            size = re.findall(r'<span>(.+?)</p>', temp_title)
+            title_text = re.findall(r'<p>(.+?)<span>', temp_title)
 
             # to fix some ad script
-            trashcode = re.findall(r'<a(.+?)script>', titleText[0])
+            trash_code = re.findall(r'<a(.+?)script>', title_text[0])
 
-            if len(trashcode) > 0:
-                trashTitle = titleText[0]
-                for t in range(0, len(trashcode)):
-                    trashTitle = trashTitle.replace('<a' + trashcode[t] + 'script>', "")
-                realTitle = trashTitle
+            if len(trash_code) > 0:
+                trash_title = title_text[0]
+                for t in range(0, len(trash_code)):
+                    trash_title = trash_title.replace('<a' + trash_code[t] + 'script>', "")
+                real_title = trash_title
             else:
-                realTitle = titleText[0]
+                real_title = title_text[0]
 
-            resData = {"title": realTitle, "magnet": "magnet" + magnet[x], "thunder": "thunder" + thunder[x],"size": size[0]}
-            queryList.append(resData)
+            result_data = {"title": real_title, "magnet": "magnet" + magnet[x], "thunder": "thunder" + thunder[x], "size": size[0]}
+            QUERY_LIST.append(result_data)
     except Exception, e:
         print e
 
-def clearDB():
+
+def clear_data():
     print '[*] 清空上一次的采集数据...'
     try:
-        cx = sqlite3.connect(sys.path[0]+"/search.db")
+        cx = sqlite3.connect(sys.path[0] + "/search.db")
         cx.text_factory = str
         cu = cx.cursor()
         cu.execute("delete from `record`")
@@ -128,43 +126,43 @@ def clearDB():
         print e
 
 
-def saveToDB():
+def save_data():
     print '[*] 开始存储数据到数据库...'
-    saveCount = 0
+    save_count = 0
     try:
         cx = sqlite3.connect(sys.path[0] + "/search.db")
         cx.text_factory = str
         cu = cx.cursor()
-        print len(queryList)
-        for m in queryList:
-            cu.execute("select * from record where magnet='%s' or thunder='%s'" % (m['magnet'], m['thunder']))
+        print len(QUERY_LIST)
+        for m in QUERY_LIST:
+            cu.execute("select * from record where magnet=? or thunder=?", (m['magnet'], m['thunder']))
             if not cu.fetchone():
-                cu.execute("insert into record (title,magnet,thunder,size) values (?,?,?,?)",(m['title'], m['magnet'], m['thunder'], m['size']))
+                cu.execute("insert into record (title,magnet,thunder,size) values (?,?,?,?)", (m['title'], m['magnet'], m['thunder'], m['size']))
                 cx.commit()
                 print '[√] => Insert successly!'
-                saveCount = saveCount + 1
+                save_count = save_count + 1
             else:
-                print R+'[x] <= Found in database!'+W
+                print R + '[x] <= Found in database!' + W
         cu.close()
         cx.close()
 
-        print '*'*60
-        print '[√] 数据采集完成，共采集%s条' % str(len(queryList))
-        print '[√] 数据存储完成，共存储%s条' % saveCount
+        print '*' * 60
+        print '[√] 数据采集完成，共采集%s条' % str(len(QUERY_LIST))
+        print '[√] 数据存储完成，共存储%s条' % save_count
     except Exception, e:
         print e
 
 
 if __name__ == '__main__':
-    global queryList
-    global headers
+    global QUERY_LIST
+    global HEADERS
 
-    queryList = []
-    headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0"}
+    QUERY_LIST = []
+    HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0"}
 
     print '[*] Searching ...'
     print '[*]' + '-' * 60
 
-    getUrlByBTmayi()
-    clearDB()
-    saveToDB()
+    get_url_by_btant()
+    clear_data()
+    save_data()
