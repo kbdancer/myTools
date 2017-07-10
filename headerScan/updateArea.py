@@ -56,7 +56,7 @@ def get_location_by_taobao(host):
 
 def get_no_area():
     try:
-        result = json.loads(requests.get('http://header.telnetscan.org/app/noarea.php').content)
+        result = json.loads(requests.get('http://www.abc.com/noarea.php').content)
         bThread(result['data'])
     except Exception, e:
         print e
@@ -67,7 +67,7 @@ def do_main_action(ip_info):
     ip = json.loads(ip_info)['ip']
     location_string = get_location_by_taobao(ip)
     try:
-        url = 'http://header.telnetscan.org/app/setarea.php?id=' + str(id) + '&country=' + location_string[0] + '&province=' + location_string[1] + '&city=' + location_string[2]
+        url = 'http://www.abc.com/setarea.php?id=' + str(id) + '&country=' + location_string[0] + '&province=' + location_string[1] + '&city=' + location_string[2]
         set_result = json.loads(requests.get(url).content)
         if set_result['code'] == 0:
             print url + ' -> OK'

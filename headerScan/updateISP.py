@@ -60,7 +60,7 @@ def do_main_action(ip_info):
     ip = json.loads(ip_info)['ip']
     isp_info = get_ips_by_138(ip)
     try:
-        url = 'http://header.telnetscan.org/app/setisp.php?id=' + str(id) + '&isp=' + isp_info
+        url = 'http://www.abc.com/setisp.php?id=' + str(id) + '&isp=' + isp_info
         set_result = json.loads(requests.get(url).content)
         if set_result['code'] == 0:
             print url + ' -> OK'
@@ -73,7 +73,7 @@ def do_main_action(ip_info):
 
 def get_no_isp():
     try:
-        result = json.loads(requests.get('http://header.telnetscan.org/app/noisp.php').content)
+        result = json.loads(requests.get('http://www.abc.com/noisp.php').content)
         bThread(result['data'])
     except Exception, e:
         print e

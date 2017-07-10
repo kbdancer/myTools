@@ -1,35 +1,39 @@
 <?php
+    $dbms='mysql';     //数据库类型
+    $host='localhost'; //数据库主机名
+    $dbName='scan_header';    //使用的数据库
+    $user='scanner';      //数据库连接用户名
+    $pass='scanner';          //对应的密码
+    $dsn="$dbms:host=$host;dbname=$dbName";
 
-    $db_name = 'scan_header';
-    $db_user = 'ipdb';
-    $db_pass = 'uJMt8LBPEImsQzaH';
-    $db_host = 'localhost';
+    try {
+        $dbh = new PDO($dsn, $user, $pass);
+        $dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
-    $conn = @mysql_connect($db_host,$db_user,$db_pass);
-    if (!$conn){ echo json_encode(array('code'=>88));exit;}
-    mysql_select_db($db_name, $conn);
-    mysql_query("set names utf8");
+        $limit = $_GET['limit'];
 
-    $limit = $_GET['limit'];
+        if(empty($limit)){
+            $limit = 100;
+        }
 
-    if(empty($limit)){
-        $limit = 100;
+        if($limit > 100){
+            echo '<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>请付费查询</body></html>';
+            exit();
+        }
+
+        $checkSql = "select ip,port,server,title,createtime from info order by createtime desc limit :limit";
+        $stmt = $dbh->prepare($checkSql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stmt->bindValue(':limit',$limit);
+        $stmt->execute();
+        $index = 1;
+        echo '<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><style type="text/css">a{text-decoration: none;}table{width: 100%;table-layout: fixed; border-right: #ccc 1px solid;border-top: #ccc 1px solid;}table td,table th{color: #555; text-align: left; font-size: 12px;padding: 2px 5px;border-left: #ccc 1px solid;border-bottom: #ccc 1px solid;}</style></head><body><table cellpadding="0" cellspacing="0"><tr><th width="50">编号</th><th width="180">主机</th><th>服务器</th><th>标题</th><th width="130">入库时间</th></tr>';
+        while ($row = $stmt->fetch()) {
+            echo '<tr><td>'.$index++.'</td><td><a target="_blank" href="'. ($row['port'] == 443 ? 'https':'http') .'://'.$row['ip'].':'.$row['port'].'">'. ($row['port'] == 443 ? 'https':'http') .'://'.$row['ip'].':'.$row['port'].'</a></td><td>'.$row['server'].'</td><td>'.$row['title'].'</td><td>'.$row['createtime'].'</td></tr>';
+        }
+        echo '</table></body></html>';
+        $stmt->closeCursor();
+        $dbh = null;
+    } catch (PDOException $e) {
+        die ("Error!: " . $e->getMessage() . "<br/>");
     }
-
-    if($limit > 100){
-        echo '<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>请付费</body></html>';
-        exit();
-    }
-
-    $selectServer = sprintf(
-        "select ip,port,server,title,createtime from info order by createtime desc limit %s",
-        mysql_real_escape_string($limit)
-    );
-    $checkRes = mysql_query($selectServer);
-    $index = 1;
-    echo '<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body><b>本次查询设置为最多返回'.$limit.'条结果</b>';
-    while($row = mysql_fetch_array($checkRes)){
-        echo '<p style="font-size:12px;padding:0;margin:0;">['.$index++.']['. $row['createtime'] .'] 链接：<a target="_blank" href="http://'.$row['ip'].':'.$row['port'].'">http://'.$row['ip'].':'.$row['port'].'</a> 服务器：'.$row['server'].' 标题：'.$row['title'].'</p>';
-    }
-    echo '</body></html>';
 ?>

@@ -57,7 +57,7 @@ def get_ports_from_remote():
     tmp_port = []
     try:
         ports_result = json.loads(
-            requests.get(url='http://header.telnetscan.org/app/ports.php', headers=HEADERS, timeout=15).content)
+            requests.get(url='http://www.abc.com/ports.php', headers=HEADERS, timeout=15).content)
         for port in ports_result['data']:
             tmp_port.append(int(port))
         return tmp_port
@@ -68,7 +68,10 @@ def get_ports_from_remote():
 def check_serve_info(host):
     for k in PORTS:
         try:
-            aim_url = "http://" + host + ":" + str(k)
+            if k == 443:
+                aim_url = "https://" + host + ":" + str(k)
+            else:
+                aim_url = "http://" + host + ":" + str(k)
             response = requests.get(url=aim_url, headers=HEADERS, timeout=5)
             for header_item in response.headers:
                 if 'erver' in header_item:
@@ -86,8 +89,7 @@ def check_serve_info(host):
 
 def save_data_to_server(aim_data):
     try:
-        result = json.loads(
-            requests.post(url='http://header.telnetscan.org/app/insertto.php', headers=HEADERS, data=aim_data, timeout=15).content)
+        result = json.loads(requests.post(url='http://www.abc.com/insertto.php', headers=HEADERS, data=aim_data, timeout=15).content)
 
         if result['code'] == 0:
             print "Save Success!"

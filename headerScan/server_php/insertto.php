@@ -1,51 +1,51 @@
 <?php
 
-    $db_name = 'scan_header';
-    $db_user = 'ipdb';
-    $db_pass = 'uJMt8LBPEImsQzaH';
-    $db_host = 'localhost';
+	$dbms='mysql';     //数据库类型
+	$host='localhost'; //数据库主机名
+	$dbName='scan_header';    //使用的数据库
+	$user='scanner';      //数据库连接用户名
+	$pass='scanner';          //对应的密码
+	$dsn="$dbms:host=$host;dbname=$dbName";
 
-	$conn = @mysql_connect($db_host,$db_user,$db_pass);
-	if (!$conn){ echo json_encode(array('code'=>88));exit;}
-	mysql_select_db($db_name, $conn);
-	mysql_query("set names utf8");
+	try {
+		$dbh = new PDO($dsn, $user, $pass);
+		$dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
-	$server_ip = addslashes($_POST['ip']);
-	$server_port = addslashes($_POST['port']);
-	$server_server = addslashes($_POST['server']);
-	$server_title = addslashes($_POST['title']);
+        $server_ip = addslashes($_POST['ip']);
+        $server_port = addslashes($_POST['port']);
+        $server_server = addslashes($_POST['server']);
+        $server_title = addslashes($_POST['title']);
 
-	if(strlen($server_ip) < 1){
-		echo json_encode(array('code'=>-1,"msg"=>"IP can not be empty."));
-		exit;
-	}
+        if(strlen($server_ip) < 1){
+            echo json_encode(array('code'=>-1,"msg"=>"IP can not be empty."));
+            exit;
+        }
 
-	$hash = md5($server_ip.$server_port.$server_server.$server_title);
-	$check = sprintf("SELECT id FROM info where hash='%s'", $hash);
-	$checkRes = mysql_query($check);
-
-	if(mysql_fetch_array($checkRes)[0] > 0){
-		echo json_encode(array('code'=>-1,"msg"=>"IP has been exist."));
-		exit;
-	}else{
-		$remote_host = $_SERVER["REMOTE_ADDR"];
-		$insertServer = sprintf(
-			"INSERT INTO info(ip,port,server,title,client,hash) VALUES('%s','%s','%s','%s','%s','%s')",
-			mysql_real_escape_string($server_ip),
-			mysql_real_escape_string($server_port),
-			mysql_real_escape_string($server_server),
-			mysql_real_escape_string($server_title),
-			mysql_real_escape_string($remote_host),
-			mysql_real_escape_string($hash)
-		);
-
-		$saveRes = mysql_query($insertServer);
-
-		if($saveRes){
-			echo json_encode(array("code"=>0));
-		}else{
-			echo json_encode(array("code"=>-1,"msg"=>"Save Failed."));
-		}
-		exit;
+        $hash = md5($server_ip.$server_port.$server_server.$server_title);
+        $checkSql = "SELECT id FROM info where hash = :hash";
+        $stmt = $dbh->prepare($checkSql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stmt->bindValue(':hash',$hash);
+        $stmt->execute();
+        if (count($stmt->fetchAll()) > 0){
+            echo json_encode(array('code'=>-1,"msg"=>"IP has been exist."));
+            $stmt->closeCursor();
+		    exit;
+        }else{
+            $remote_host = $_SERVER["REMOTE_ADDR"];
+            $querySql = "INSERT INTO info(ip,port,server,title,client,hash) VALUES(:ip,:port,:server,:title,:client,:hash)";
+			$stmt_insert = $dbh->prepare($querySql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+            $stmt_insert->bindValue(':ip',$server_ip);
+            $stmt_insert->bindValue(':port',$server_port);
+            $stmt_insert->bindValue(':server',$server_server);
+            $stmt_insert->bindValue(':title',$server_title);
+            $stmt_insert->bindValue(':client',$remote_host);
+            $stmt_insert->bindValue(':hash',$hash);
+            $stmt_insert->execute();
+            $stmt->closeCursor();
+            echo json_encode(array("code"=>0));
+        }
+		$dbh = null;
+	} catch (PDOException $e) {
+		die ("Error!: " . $e->getMessage() . "<br/>");
 	}
 ?>

@@ -1,21 +1,27 @@
 <?php
 
-    $db_name = 'scan_header';
-    $db_user = 'ipdb';
-    $db_pass = 'uJMt8LBPEImsQzaH';
-    $db_host = 'localhost';
+    $dbms='mysql';     //数据库类型
+    $host='localhost'; //数据库主机名
+    $dbName='scan_header';    //使用的数据库
+    $user='scanner';      //数据库连接用户名
+    $pass='scanner';          //对应的密码
+    $dsn="$dbms:host=$host;dbname=$dbName";
 
+    try {
+        $dbh = new PDO($dsn, $user, $pass);
+        $dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
-    $conn = @mysql_connect($db_host,$db_user,$db_pass);
-    if (!$conn){ echo json_encode(array('code'=>88));exit;}
-    mysql_select_db($db_name, $conn);
-    mysql_query("set names utf8");
-
-    $selectServer = "select port from ports where enable = 1 order by port";
-    $checkRes = mysql_query($selectServer);
-    $res = array();
-    while($row = mysql_fetch_array($checkRes)){
-        array_push($res,(int)$row['port']);
+        $querySql = "select port from ports where enable = 1 order by port";
+        $stmt = $dbh->prepare($querySql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        $stmt->execute();
+        $res = array();
+        while ($row = $stmt->fetch()) {
+            array_push($res,(int)$row['port']);
+        }
+        echo json_encode(array("data"=>$res));
+        $stmt->closeCursor();
+        $dbh = null;
+    } catch (PDOException $e) {
+        die ("Error!: " . $e->getMessage() . "<br/>");
     }
-    echo json_encode(array("data"=>$res));
 ?>
