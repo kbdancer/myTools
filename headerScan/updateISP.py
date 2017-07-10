@@ -11,6 +11,7 @@ import re
 
 reload(sys)
 sys.setdefaultencoding('gb2312')
+requests.packages.urllib3.disable_warnings()
 
 
 def bThread(ip_list):

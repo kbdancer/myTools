@@ -10,6 +10,7 @@ import sys
 
 reload(sys)
 sys.setdefaultencoding('gb2312')
+requests.packages.urllib3.disable_warnings()
 
 
 def bThread(iplist):
@@ -45,7 +46,7 @@ def get_location_by_taobao(host):
     try:
         ip_url = "http://ip.taobao.com/service/getip_info.php?ip=" + host
         header = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0"}
-        req = requests.get(url=ip_url, headers=header, timeout=10)
+        req = requests.get(url=ip_url, headers=header, verify=False, timeout=10)
         json_data = json.loads(req.content.decode('utf8').encode('utf8'))['data']
         info = [json_data['country'], json_data['region'], json_data['city'], json_data['isp']]
         return info
