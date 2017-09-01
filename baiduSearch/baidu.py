@@ -36,7 +36,6 @@ if __name__ == '__main__':
     global KEYWORDS
     global MAXPAGE
     global HEADERS
-    global IPS
 
     KEYWORDS = sys.argv[2]
     MAXPAGE = int(sys.argv[1])
