@@ -45,3 +45,8 @@ http://www.92ez.com/?action=show&id=23405
 自己用的一个获取IP段的脚本（抓取http://ips.chacuo.net）
 
 文档待补充
+
+### 0x07: baiduSearch
+自动化抓取百度搜索结果并写入到文本，使用方法见效果图
+
+文档待补充

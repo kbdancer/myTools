@@ -4,14 +4,12 @@
 
 import threading
 import requests
-import Queue
+import queue
 import json
 import sys
 import re
 import os
 
-reload(sys)
-sys.setdefaultencoding('utf8')
 requests.packages.urllib3.disable_warnings()
 
 
@@ -30,12 +28,12 @@ def ip_range(start, end):
 
 def bThread(ip_list):
     thread_list = []
-    queue = Queue.Queue()
+    queue_list = queue.Queue()
     for host in ip_list:
-        queue.put(host)
+        queue_list.put(host)
 
-    for x in xrange(0, int(SETTHREAD)):
-        thread_list.append(tThread(queue))
+    for x in range(0, int(SETTHREAD)):
+        thread_list.append(tThread(queue_list))
 
     for t in thread_list:
         t.start()
@@ -44,13 +42,13 @@ def bThread(ip_list):
 
 
 class tThread(threading.Thread):
-    def __init__(self, queue):
+    def __init__(self, queue_list):
         threading.Thread.__init__(self)
-        self.queue = queue
+        self.queue_list = queue_list
 
     def run(self):
-        while not self.queue.empty():
-            host = self.queue.get()
+        while not self.queue_list.empty():
+            host = self.queue_list.get()
             check_serve_info(host)
 
 
@@ -58,12 +56,12 @@ def get_ports_from_remote():
     tmp_port = []
     try:
         ports_result = json.loads(
-            requests.get(url='http://www.abc.com/ports.php', headers=HEADERS, verify=False, timeout=15).content)
+            requests.get(url='https://data.telnetscan.org/ports.php', headers=HEADERS, verify=False, timeout=15).content)
         for port in ports_result['data']:
             tmp_port.append(int(port))
         return tmp_port
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
 
 
 def check_serve_info(host):
@@ -77,53 +75,53 @@ def check_serve_info(host):
             for header_item in response.headers:
                 if 'erver' in header_item:
                     server_text = response.headers[header_item]
-            title_text = re.findall(r'<title>(.*?)</title>', response.content.decode('utf-8').encode('utf-8'))[0]
+            title_text = re.findall(r'<title>(.*?)</title>', response.content.decode('utf-8'))[0]
 
             if len(server_text) > 0:
                 save_data = {"ip": host, "port": str(k), "server": server_text, "title": title_text}
-                print str(save_data)
+                print(str(save_data))
                 save_data_to_server(save_data)
-        except Exception, e:
-            # print e
+        except Exception as e:
+            # print(e)
             pass
 
 
 def save_data_to_server(aim_data):
     try:
-        result = json.loads(requests.post(url='http://www.abc.com/insertto.php', headers=HEADERS, verify=False, data=aim_data, timeout=15).content)
+        result = json.loads(requests.post(url='https://data.telnetscan.org/insertto.php', headers=HEADERS, verify=False, data=aim_data, timeout=15).content)
 
         if result['code'] == 0:
-            print "Save Success!"
+            print("Save Success!")
         else:
-            print "Save Failed!"
+            print("Save Failed!")
 
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':
-    print '############# HTTP Header Scanner ###########'
-    print '                Author 92ez.com'
-    print '#############################################\n'
+    print('############# HTTP Header Scanner ###########')
+    print('                Author 92ez.com')
+    print('#############################################\n')
 
     global SETTHREAD
-    global this_pid
+    global THIS_PID
     global PORTS
     global HEADERS
 
     HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0"}
 
-    this_pid = os.getpid()
+    THIS_PID = os.getpid()
     PORTS = get_ports_from_remote()
-    print '[*] This pid is ' + str(this_pid)
+    print('[*] This pid is ' + str(THIS_PID))
 
     try:
         SETTHREAD = sys.argv[1]
         startIp = sys.argv[2].split('-')[0]
         endIp = sys.argv[2].split('-')[1]
         ip_list = ip_range(startIp, endIp)
-        print '[Note] Will scan ' + str(len(ip_list)) + " host...\n"
+        print('[Note] Will scan ' + str(len(ip_list)) + " host...\n")
         bThread(ip_list)
     except KeyboardInterrupt:
-        print '\n[*] Kill all thread.'
-        os.kill(this_pid, 9)
+        print('\n[*] Kill all thread.')
+        os.kill(THIS_PID, 9)
