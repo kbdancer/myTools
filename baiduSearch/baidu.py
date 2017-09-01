@@ -40,7 +40,6 @@ if __name__ == '__main__':
     KEYWORDS = sys.argv[2]
     MAXPAGE = int(sys.argv[1])
     HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0"}
-    IPS = []
     real_domains = []
     real_links = []
 
@@ -58,12 +57,14 @@ if __name__ == '__main__':
         real_links.append(this_real_url)
         print('[*] 域名:' + this_domain + ' --> ' + this_real_url)
     print('[√] 提取真实链接完成')
+    # 写入真实链接到文本
     real_links = set(real_links)
     with open(sys.path[0] + '/search_link.txt', 'wb') as f:
         for host in real_links:
             f.write(str.encode(host+'\n'))
         f.flush()
         f.close()
+    # 写入域名到文本
     real_domains = set(real_domains)
     with open(sys.path[0] + '/search_domains.txt', 'wb') as f:
         for host in real_domains:
