@@ -5,7 +5,6 @@
 import threading
 import requests
 import queue
-import json
 import sys
 import re
 import os
@@ -55,8 +54,7 @@ class tThread(threading.Thread):
 def get_ports_from_remote():
     tmp_port = []
     try:
-        ports_result = json.loads(
-            requests.get(url='https://data.telnetscan.org/ports.php', headers=HEADERS, verify=False, timeout=15).content)
+        ports_result = requests.get(url='https://data.telnetscan.org/ports.php', headers=HEADERS, verify=False, timeout=15).json()
         for port in ports_result['data']:
             tmp_port.append(int(port))
         return tmp_port
@@ -71,6 +69,7 @@ def check_serve_info(host):
                 aim_url = "https://" + host + ":" + str(k)
             else:
                 aim_url = "http://" + host + ":" + str(k)
+
             response = requests.get(url=aim_url, headers=HEADERS, verify=False, timeout=5)
             for header_item in response.headers:
                 if 'erver' in header_item:
@@ -88,7 +87,7 @@ def check_serve_info(host):
 
 def save_data_to_server(aim_data):
     try:
-        result = json.loads(requests.post(url='https://data.telnetscan.org/insertto.php', headers=HEADERS, verify=False, data=aim_data, timeout=15).content)
+        result = requests.post(url='https://data.telnetscan.org/insertto.php', headers=HEADERS, verify=False, data=aim_data, timeout=15).json()
 
         if result['code'] == 0:
             print("Save Success!")
