@@ -70,7 +70,7 @@ def check_serve_info(host):
             else:
                 aim_url = "http://" + host + ":" + str(k)
 
-            response = requests.get(url=aim_url, headers=HEADERS, verify=False, timeout=5)
+            response = requests.get(url=aim_url, headers=HEADERS, verify=False, timeout=50)
             for header_item in response.headers:
                 if 'erver' in header_item:
                     server_text = response.headers[header_item]
@@ -87,7 +87,7 @@ def check_serve_info(host):
 
 def save_data_to_server(aim_data):
     try:
-        result = requests.post(url='https://data.telnetscan.org/insertto.php', headers=HEADERS, verify=False, data=aim_data, timeout=15).json()
+        result = requests.post(url='https://data.telnetscan.org/insertto.php', headers=HEADERS, verify=False, data=aim_data, timeout=30).json()
 
         if result['code'] == 0:
             print("Save Success!")
