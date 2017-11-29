@@ -52,3 +52,12 @@ http://www.92ez.com/?action=show&id=23405
 ![](https://raw.githubusercontent.com/kbdancer/myTools/master/baiduSearch/screencut/search.png)
 
 文档待补充
+
+### 0x08: tumblrDownload
+自动化下载指定汤不热博客的所有图片素材或者视频
+
+![](https://www.92ez.com/attachment.php?id=562)
+
+脚本实现
+
+https://www.92ez.com/?action=show&id=23460
