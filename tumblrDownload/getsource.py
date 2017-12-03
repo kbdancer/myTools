@@ -67,8 +67,8 @@ def write_file(source_url, dir_path, file_name):
 
 
 if __name__ == '__main__':
-    # source_type = sys.argv[1]
-    source_type = "images"
-    # user_nickname = sys.argv[2]
-    user_nickname = "shutdown101"
+    source_type = sys.argv[1]
+    # source_type = "images"
+    user_nickname = sys.argv[2]
+    # user_nickname = "itunesartworks"
     get_source(user_nickname, 1, source_type)
