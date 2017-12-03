@@ -11,10 +11,18 @@ def get_source(nickname, page_index, source_type):
     aim_url = "https://%s.tumblr.com/page/%d" % (nickname, page_index)
     print('[o] Get source from blog %s ...' % aim_url)
     try:
-        response_string = requests.get(url=aim_url, timeout=50).content.decode('utf8')
+        response_string = requests.get(url=aim_url, timeout=50).content.decode('utf8').replace('\n', '')
         if "posts-no-posts content" not in response_string:
             if source_type == "images":
                 source_elements = re.findall(r'<img(.+?)>', response_string)
+                source_iframes = re.findall(r'id="photoset_iframe(.+?)>', response_string)  # for special images iframe
+                if len(source_iframes) > 0:
+                    for iframe_item in source_iframes:
+                        this_iframe_url = re.findall(r'src="(.+?)"', iframe_item)[0]
+                        image_iframe_url = "https://%s.tumblr.com" % nickname + this_iframe_url
+                        images_iframe_response = requests.get(url=image_iframe_url, timeout=50).content.decode('utf8').replace('\n', '')
+                        iframe_images = re.findall(r'<img(.+?)>', images_iframe_response)
+                        source_elements += iframe_images
             else:
                 source_elements = re.findall(r'<iframe(.+?)>', response_string)
 
@@ -32,7 +40,7 @@ def get_source(nickname, page_index, source_type):
                     else:
                         if "/video/" in this_source:
                             video_url = re.findall(r"src='(.+?)'", this_source)[0]
-                            video_response = requests.get(url=video_url, timeout=50).content.decode('utf8')
+                            video_response = requests.get(url=video_url, timeout=50).content.decode('utf8').replace('\n', '')
                             video_source = re.findall(r'<source src="(.+?)"', video_response)[0]
                             video_name = video_source.split('tumblr_')[1].split('/')[0] + '.mp4'
                             write_file(video_source, dir_path, video_name)
@@ -62,5 +70,5 @@ if __name__ == '__main__':
     # source_type = sys.argv[1]
     source_type = "images"
     # user_nickname = sys.argv[2]
-    user_nickname = "itunesartworks"
+    user_nickname = "shutdown101"
     get_source(user_nickname, 1, source_type)
