@@ -131,12 +131,12 @@ def get_source(nickname, page_index, source_type, user_id):
             else:
                 print('[x] Can not get any source.')
             page_index += 1
-            get_source(nickname, page_index, source_type)
+            get_source(nickname, page_index, source_type, user_id)
         else:
             print('[!] Get source complete!')
     except Exception as e:
         print(e)
-        get_source(nickname, page_index, source_type)
+        get_source(nickname, page_index, source_type, user_id)
 
 
 def write_file(source_url, dir_path, file_name):
