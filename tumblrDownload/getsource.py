@@ -33,17 +33,23 @@ def get_source(nickname, page_index, source_type):
 
                 for this_source in source_elements:
                     if source_type == "images":
+                        img_dir = dir_path + 'image/'
+                        if not os.path.exists(img_dir):
+                            os.makedirs(img_dir)
                         image_url = re.findall(r'src="(.+?)"', this_source)[0]
                         image_name = image_url.split('/')[-1]
                         if "tumblr_" in image_name:
-                            write_file(image_url, dir_path, image_name)
+                            write_file(image_url, img_dir, image_name)
                     else:
                         if "/video/" in this_source:
+                            video_dir = dir_path + 'video/'
+                            if not os.path.exists(video_dir):
+                                os.makedirs(video_dir)
                             video_url = re.findall(r"src='(.+?)'", this_source)[0]
                             video_response = requests.get(url=video_url, timeout=50).content.decode('utf8').replace('\n', '')
                             video_source = re.findall(r'<source src="(.+?)"', video_response)[0]
-                            video_name = video_source.split('tumblr_')[1].split('/')[0] + '.mp4'
-                            write_file(video_source, dir_path, video_name)
+                            video_name = video_source.split('/')[-1] + '.mp4'
+                            write_file(video_source, video_dir, video_name)
 
             else:
                 print('[x] Can not get any source.')
