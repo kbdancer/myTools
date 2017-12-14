@@ -1,0 +1,10 @@
+<h2>用户授权码：{{ uid }}</h2>
+<table>
+    {% for dir in data %}
+    <tr><td><a href="/list?blog={{ blog }}&dir={{ dir }}&uid={{ uid }}">{{ dir }}</a> </td></tr>
+    {% endfor %}
+</table>
+<style>
+    table{border:#ccc 1px solid;}
+    table td{border:#ccc 1px solid;}
+</style>
