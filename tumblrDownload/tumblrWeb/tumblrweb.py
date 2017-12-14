@@ -16,14 +16,14 @@ def search():
     nickname = request.form.get('nickname')
     source_type = request.form.get('type')
     user_id = request.form.get('uid')
-    if user_id != "userid123":
-        return "can not use!"
-    else:
+    if user_id == "user0001":
         if len(nickname) > 0:
             get_source(nickname, 1, source_type, user_id)
             return "complete!"
         else:
             return "nickname is empty"
+    else:
+        return "can not use!!"
 
 
 @app.route("/history", methods=['GET'])
