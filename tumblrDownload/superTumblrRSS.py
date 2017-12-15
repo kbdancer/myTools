@@ -47,7 +47,7 @@ def get_source(blog_url):
         source_image_list = re.findall(r'img src="(.+?)"', response_string)
         source_video_list = re.findall(r'source src="(.+?)"', response_string)
         if len(source_image_list) > 0 or len(source_video_list) > 0:
-            blog_dir = sys.path[0] + '/' + re.findall(r'//(.+?)/', blog_url)[0] + '/'
+            blog_dir = sys.path[0] + '/RSSdownload/' + re.findall(r'//(.+?)/', blog_url)[0] + '/'
             if not os.path.exists(blog_dir):
                 os.makedirs(blog_dir)
             if len(source_image_list) > 0:
