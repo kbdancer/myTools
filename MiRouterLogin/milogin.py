@@ -3,7 +3,7 @@
 # code by kbdancer@92ez.com
 
 import requests
-from Crypto.Hash import SHA
+from hashlib import sha1
 import random
 import time
 import json
@@ -24,12 +24,12 @@ def get_router_token(host):
     nonce = "0_" + mac + "_" + str(int(time.time())) + "_" + str(random.randint(1000, 10000))
     pwd_text = sys.argv[2]
 
-    pwd = SHA.new()
-    pwd.update(pwd_text + key)
+    pwd = sha1()
+    pwd.update((pwd_text + key).encode('utf8'))
     hex_pwd_1 = pwd.hexdigest()
 
-    pwd2 = SHA.new()
-    pwd2.update(nonce + hex_pwd_1)
+    pwd2 = sha1()
+    pwd2.update((nonce + hex_pwd_1).encode('utf8'))
     hex_pwd_2 = pwd2.hexdigest()
 
     data = {
