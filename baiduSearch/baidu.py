@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 # code by 92ez.com
 
@@ -7,15 +7,17 @@ import sys
 import re
 
 
-def get_urls():
+def get_urls(keyword, page_count):
     titles = []
     old_links = []
+    custom_headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0"}
     try:
-        for page in range(0, MAXPAGE):
-            this_page_url = "https://www.baidu.com/s?wd=" + KEYWORDS + '&pn=' + str(page * 10)
+        for page in range(0, page_count):
+            this_page_url = "https://www.baidu.com/s?wd=" + keyword + '&pn=' + str(page * 10)
             print(this_page_url)
-            html_page = requests.get(url=this_page_url, headers=HEADERS).content.decode('utf8').replace('\n', '').replace('\t', '')
-            title_str = re.findall(r'<h3 class="t">(.*?)</h3>', html_page)
+            html_page = requests.get(url=this_page_url, headers=custom_headers).content.decode('utf8')
+            filter_string = html_page.replace('\n', '').replace('\t', '')
+            title_str = re.findall(r'<h3 class="t">(.*?)</h3>', filter_string)
 
             for tit in title_str:
                 try:
@@ -24,7 +26,7 @@ def get_urls():
                     this_old_link = re.findall(r'href=\"(.+?)"target', tmp_string)[0]
                     titles.append(this_title)
                     old_links.append(this_old_link)
-                except Exception as e:
+                except:
                     pass
         return titles, old_links
     except Exception as e:
@@ -33,19 +35,14 @@ def get_urls():
 
 if __name__ == '__main__':
 
-    global KEYWORDS
-    global MAXPAGE
-    global HEADERS
-
-    KEYWORDS = sys.argv[2]
-    MAXPAGE = int(sys.argv[1])
-    HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0"}
+    keywords = sys.argv[2]
+    max_page = int(sys.argv[1])
     real_domains = []
     real_links = []
 
-    print('[*] 当前设置获取前' + str(MAXPAGE * 10) + '个结果')
+    print('[*] 当前设置获取前' + str(max_page * 10) + '个结果')
     print('[*] 获取结果页标题和百度原始链接...')
-    titleArr, oldinkArr = get_urls()
+    titleArr, oldinkArr = get_urls(keywords, max_page)
     print('[√] 获取到' + str(len(titleArr)) + '个标题和原始链接')
 
     print('[*] 开始提取真实链接...')
@@ -62,12 +59,8 @@ if __name__ == '__main__':
     with open(sys.path[0] + '/search_link.txt', 'wb') as f:
         for host in real_links:
             f.write(str.encode(host+'\n'))
-        f.flush()
-        f.close()
     # 写入域名到文本
     real_domains = set(real_domains)
     with open(sys.path[0] + '/search_domains.txt', 'wb') as f:
         for host in real_domains:
             f.write(str.encode(host+'\n'))
-        f.flush()
-        f.close()
