@@ -34,12 +34,14 @@ http://www.92ez.com/?action=show&id=23373
 
 http://www.92ez.com/?action=show&id=23405
 
-### 0x05: BTsearch
-这是一个小爬虫~
+### 0x05: ~~BTsearch~~ (已删除)
+~~这是一个小爬虫~~
 
-因为我在网上随便找一个磁力链搜索站点，都TM是一大堆弹窗广告，我很不爽！
+~~因为我在网上随便找一个磁力链搜索站点，都TM是一大堆弹窗广告，我很不爽！~~
 
 相关文档 http://www.92ez.com/?action=show&id=23377
+
+提示：因为目标网站已下线，所以脚本无法工作
 
 ### 0x06: getIPRange
 自己用的一个获取IP段的脚本（抓取http://ips.chacuo.net）
