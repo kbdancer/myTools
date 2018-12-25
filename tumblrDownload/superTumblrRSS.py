@@ -55,12 +55,15 @@ def get_source(blog_url):
                 if not os.path.exists(img_dir):
                     os.makedirs(img_dir)
                 for source in source_image_list:
-                    write_file(source, img_dir, source.split('/')[-1])
+                    if 'media.tumblr.com' in source:
+                        # pass
+                        write_file(source, img_dir, source.split('/')[-1])
             if len(source_video_list) > 0:
                 video_dir = blog_dir + 'video/'
                 if not os.path.exists(video_dir):
                     os.makedirs(video_dir)
                 for source in source_video_list:
+                    # print(source)
                     write_file(source, video_dir, source.split('/')[-1] + '.mp4')
     except Exception as e:
         print(e)
