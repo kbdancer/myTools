@@ -5,9 +5,6 @@
 import MySQLdb
 import sys
 
-reload(sys)
-sys.setdefaultencoding('utf8')
-
 
 def save_data_to_mysql(mysql_object, ip_line):
     try:
@@ -24,40 +21,48 @@ def save_data_to_mysql(mysql_object, ip_line):
 
         this_line_value = [begin + "-" + end, location, isp_type]
         do_insert(mysql_object, this_line_value)
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
 
 
 def do_insert(mysql_object, row_data):
     try:
-        insert_sql = """INSERT INTO `ipdb` (`iprange`,`location`, `type`) VALUES ( %s, %s, %s )"""
+        insert_sql = """INSERT INTO `ipdb` (`range`,`location`, `type`) VALUES ( %s, %s, %s )"""
         mysql_object.insert(insert_sql, row_data)
-    except Exception, e:
-        print row_data
-        print e
+    except Exception as e:
+        print(e)
 
 
 class Database:
-    host = 'localhost'
-    user = 'ipdb'
-    password = '3u9whrpcEUBTnNNn'
-    db = 'ipinfo'
-    charset = 'utf8'
-
     def __init__(self):
-        self.connection = MySQLdb.connect(self.host, self.user, self.password, self.db, charset=self.charset)
+        self.connection = MySQLdb.connect(
+            host='localhost',
+            port=3306,
+            user='root',
+            passwd='root',
+            db='czip',
+            charset='utf8'
+        )
         self.cursor = self.connection.cursor()
 
     def insert(self, query, params):
         try:
             self.cursor.execute(query, params)
             self.connection.commit()
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
+            self.connection.rollback()
+
+    def update(self, query, params):
+        try:
+            self.cursor.execute(query, params)
+            self.connection.commit()
+        except Exception as e:
+            print(e)
             self.connection.rollback()
 
     def query(self, query, params):
-        cursor = self.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor = self.connection.cursor()
         cursor.execute(query, params)
         return cursor.fetchall()
 
@@ -68,8 +73,8 @@ class Database:
 if __name__ == '__main__':
     mysql = Database()
     ip_file = open(sys.path[0] + "/ip.txt")
-    print 'Start save to mysql ...'
+    print('Start save to mysql ...')
     for line in ip_file:
         save_data_to_mysql(mysql, line)
     ip_file.close()
-    print 'Save complete.'
+    print('Save complete.')
